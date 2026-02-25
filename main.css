@@ -1,0 +1,24 @@
+* {
+    color: #F1F1F1;
+    background-color: #15151a;
+    font-family: Verdana;
+    font-size: 35px;
+}
+h1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+a {
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    text-decoration: none;
+    text-align: center;
+}
+#lokal:hover{
+    color: rgb(0, 119, 255);
+}
+#splet:hover{
+    color: rgb(238, 34, 34);
+}
