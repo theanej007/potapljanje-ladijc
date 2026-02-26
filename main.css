@@ -22,16 +22,22 @@ a {
 #splet:hover{
     color: rgb(238, 34, 34);
 }
-.container {
+#main_c {
     display: grid;
     grid-template-columns: auto auto auto;
     background-color: #1ca3ec;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(11, 1fr);
+    max-width: 800px;
+    margin: auto;
 }
 .container div {
-    background-color: #1ca3ec;
+    background-color: rgb(0, 119, 255);
     color: BLACK;
-    border: 1px solid black;
+    border: 1px solid WHITE;
     font-size: 20px;
     text-align: center;
+    display: flex;
+    align-items: center;     /* vertical center */
+    justify-content: center; /* horizontal center (optional) */
+    height: 70px;
 }
