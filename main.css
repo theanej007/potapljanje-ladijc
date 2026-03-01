@@ -24,10 +24,10 @@ h1 {
 }
 #main_c {
     display: grid;
-    grid-template-columns: auto auto auto;
     background-color: #1ca3ec;
     grid-template-columns: repeat(11, 1fr);
-    max-width: 800px;
+    width: 800px;
+    height: 800px;
     margin-left: 10%;
     margin-top: 1%;
 }
@@ -49,4 +49,16 @@ h1 {
 }
 #back:hover{
     color: #c2c2c2;
+}
+#upperDiv {
+    display: flex;
+}
+#right {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    margin-left: 10%;
+    margin-top: 50px;
+}
+img {
+    background-color: transparent;
 }
