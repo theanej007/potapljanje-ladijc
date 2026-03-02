@@ -1,10 +1,10 @@
 let divDesna = document.getElementById("right");
-let eleP_aircraft = document.createElement("p");
-eleP_aircraft.textContent = "1x";
-eleP_aircraft.id = "P_aircraft";
-let eleIMG_aircraft = document.createElement("img");
-eleIMG_aircraft.src = "slike/planecarrier.png";
-eleIMG_aircraft.onclick = function(){selected = 1;window.dispatchEvent(selectChange);};
+let eleP_planecarrier = document.createElement("p");
+eleP_planecarrier.textContent = "1x";
+eleP_planecarrier.id = "P_aircraft";
+let eleIMG_planecarrier = document.createElement("img");
+eleIMG_planecarrier.src = "slike/planecarrier.png";
+eleIMG_planecarrier.onclick = function(){selected = 1;window.dispatchEvent(selectChange);};
 let eleP_battleship = document.createElement("p");
 eleP_battleship.textContent = "1x";
 eleP_battleship.id = "P_battleship";
@@ -29,21 +29,52 @@ eleP_destroyer.id = "P_destroyer";
 let eleIMG_destroyer = document.createElement("img");
 eleIMG_destroyer.src = "slike/destroyer.png";
 eleIMG_destroyer.onclick = function(){selected = 5;window.dispatchEvent(selectChange);};
+let eleB_1 = document.createElement("button");
+eleB_1.id = "button1";
+eleB_1.textContent = "Konec postavljanja";
+eleB_1.onclick = function(){
+    if("0x" == eleP_cruiser.textContent && "0x" == eleP_planecarrier.textContent && "0x" == eleP_sub.textContent && "0x" == eleP_destroyer.textContent && eleP_battleship.textContent == "0x"){
+        eleP_planecarrier.textContent = "1x";
+        eleP_battleship.textContent = "1x";
+        eleP_sub.textContent = "1x";
+        eleP_cruiser.textContent = "2x";
+        eleP_destroyer.textContent = "2x";
+        for(let i = 0;i < 10;i++){
+            for(let j = 0;j < 10;j++){
+                let temp = document.getElementById("d"+(String.fromCharCode(i+65))+(j+1));
+                if(temp.firstElementChild != null)
+                temp.removeChild(temp.firstElementChild);
+                temp.style.backgroundColor = "#DC143C";
+            }
+            document.getElementById("d"+(i+1)).style.backgroundColor = "#DC143C";
+            document.getElementById("d"+(String.fromCharCode(i+65))).style.backgroundColor = "#DC143C";
+        }
+        document.getElementById("d0").style.backgroundColor = "#DC143C";
+        document.getElementById("main_c").style.backgroundColor = "#DC143C";
+        removeEventListener("mouseout", box);
+        box.addEventListener("mouseout", function(event){
+            event.target.style.background = "#DC143C";
+        });
+        player = !player;
+    }
+};
+
 
 setupPlacement();
+let player = true;
 let selected = 0;
 let ships = 7;
 let rotation = 0;
 const selectChange = new CustomEvent("selectChanged");
 window.addEventListener("selectChanged", function(){
-    eleIMG_aircraft.style.background = "transparent";
+    eleIMG_planecarrier.style.background = "transparent";
     eleIMG_battleship.style.background = "transparent";
     eleIMG_sub.style.background = "transparent";
     eleIMG_cruiser.style.background = "transparent";
     eleIMG_destroyer.style.background = "transparent";
     switch(selected){
         case 1:
-            eleIMG_aircraft.style.background = "#4CBB17";
+            eleIMG_planecarrier.style.background = "#4CBB17";
             break;
         case 2:
             eleIMG_battleship.style.background = "#4CBB17";
@@ -75,6 +106,13 @@ for(let i = 0;i < posLadij1.length;i++){
         posLadij1[i][j] = false;
     }
 };
+let posLadij2 = new Array(10);
+for(let i = 0;i < posLadij2.length;i++){
+    posLadij2[i] = new Array(10);
+    for(let j = 0;j < posLadij2[i].length;j++){
+        posLadij2[i][j] = false;
+    }
+};
 window.addEventListener("keydown", (event) => {
     if (event.key === "r"){
         rotation = (rotation == 0)? 1:0;
@@ -101,41 +139,80 @@ box.addEventListener("click", function(event){
                 break;
         };
         let ladja = "";
+        let num = 0;
         switch(selected){
         case 1:
             ladja = "planecarrier";
+            num = parseInt(eleP_planecarrier.textContent.substring(0, 1));
             break;
         case 2:
             ladja = "battleship";
+            num = parseInt(eleP_battleship.textContent.substring(0, 1));
             break;
         case 3:
             ladja = "sub";
+            num = parseInt(eleP_sub.textContent.substring(0, 1));
             break;
         case 4:
             ladja = "cruiser";
+            num = parseInt(eleP_cruiser.textContent.substring(0, 1));
             break;
         case 5:
             ladja = "destroyer";
+            num = parseInt(eleP_destroyer.textContent.substring(0, 1));
             break;
         };
         let id = event.target.id;
         let pos = 0;
-        if(rotation == 0 && (pos = parseInt(id.substring(2)))+length <= 11){
+        if(rotation == 0 && (pos = parseInt(id.substring(2)))+length <= 11 && num != 0){
+            let taken = false;
             for(let i = 0;i < length;i++){
-                let img = document.createElement("img");
-                img.src = "slike/"+ladja+`${(i+1)}.png`;
-                document.getElementById(id.substring(0, 2) + (pos+i)).appendChild(img);
+                if(player == true)
+                    if(posLadij1[id.charCodeAt(1)-65][pos+i-1] == true)taken = true;
+                else
+                    if(posLadij2[id.charCodeAt(1)-65][pos+i-1] == true)taken = true;
+            }
+            if(taken == false){
+                for(let i = 0;i < length;i++){
+                    if(player == true)
+                        posLadij1[id.charCodeAt(1)-65][pos+i-1] = true;
+                    else
+                        posLadij2[id.charCodeAt(1)-65][pos+i-1] = true;
+                    let img = document.createElement("img");
+                    img.src = "slike/"+ladja+`${(i+1)}.png`;
+                    document.getElementById(id.substring(0, 2) + (pos+i)).appendChild(img);
+                }
+                eval("eleP_"+ ladja +".textContent = (num-1) + 'x'");
             }
         }
-        if(rotation == 1 && (pos = id.charCodeAt(1)-64)+length <= 11){
-
+        if(rotation == 1 && (pos = id.charCodeAt(1)-64)+length <= 11 && num != 0){
+            let taken = false;
+            for(let i = 0;i < length;i++){
+                if(player == true)
+                    if(posLadij1[pos+i-1][parseInt(id.substring(2))-1] == true)taken = true;
+                else
+                    if(posLadij2[pos+i-1][parseInt(id.substring(2))-1] == true)taken = true;
+            }
+            if(taken == false){
+                for(let i = 0;i < length;i++){
+                    if(player == true)
+                        posLadij1[pos+i-1][parseInt(id.substring(2))-1] = true;
+                    else
+                        posLadij2[pos+i-1][parseInt(id.substring(2))-1] = true;
+                    let img = document.createElement("img");
+                    img.src = "slike/"+ladja+`${(i+1)}.png`;
+                    img.style.transform = "rotate(90deg)";
+                    document.getElementById(id.substring(0, 1) + String.fromCharCode(pos+i+64) + id.substring(2)).appendChild(img);
+                }
+                eval("eleP_"+ ladja +".textContent = (num-1) + 'x'");
+            }
         }
     }
 });
 
 function setupPlacement(){
-    divDesna.appendChild(eleP_aircraft);
-    divDesna.appendChild(eleIMG_aircraft);
+    divDesna.appendChild(eleP_planecarrier);
+    divDesna.appendChild(eleIMG_planecarrier);
 
     divDesna.appendChild(eleP_battleship);
     divDesna.appendChild(eleIMG_battleship);
@@ -148,4 +225,6 @@ function setupPlacement(){
 
     divDesna.appendChild(eleP_destroyer);
     divDesna.appendChild(eleIMG_destroyer);
+
+    divDesna.appendChild(eleB_1);
 }
