@@ -29,6 +29,112 @@ eleP_destroyer.id = "P_destroyer";
 let eleIMG_destroyer = document.createElement("img");
 eleIMG_destroyer.src = "slike/destroyer.png";
 eleIMG_destroyer.onclick = function(){selected = 5;window.dispatchEvent(selectChange);};
+let placement = function(event){
+    if(selected != 0 && event.target.id != ""){
+        let length = 0;
+        switch(selected){
+            case 1:
+                length = 5;
+                break;
+            case 2:
+                length = 4;
+                break;
+            case 3:
+                length = 3;
+                break;
+            case 4:
+                length = 3;
+                break;
+            case 5:
+                length = 2;
+                break;
+        };
+        let ladja = "";
+        let num = 0;
+        switch(selected){
+        case 1:
+            ladja = "planecarrier";
+            num = parseInt(eleP_planecarrier.textContent.substring(0, 1));
+            break;
+        case 2:
+            ladja = "battleship";
+            num = parseInt(eleP_battleship.textContent.substring(0, 1));
+            break;
+        case 3:
+            ladja = "sub";
+            num = parseInt(eleP_sub.textContent.substring(0, 1));
+            break;
+        case 4:
+            ladja = "cruiser";
+            num = parseInt(eleP_cruiser.textContent.substring(0, 1));
+            break;
+        case 5:
+            ladja = "destroyer";
+            num = parseInt(eleP_destroyer.textContent.substring(0, 1));
+            break;
+        };
+        let id = event.target.id;
+        let pos = 0;
+        if(rotation == 0 && (pos = parseInt(id.substring(2)))+length <= 11 && num != 0){
+            let taken = false;
+            for(let i = 0;i < length;i++){
+                if(player == true){
+                    if(posLadij1[id.charCodeAt(1)-65][pos+i-1] == true)taken = true;
+                } else {
+                    if(posLadij2[id.charCodeAt(1)-65][pos+i-1] == true)taken = true;
+                }
+            }
+            if(taken == false){
+                for(let i = 0;i < length;i++){
+                    if(player == true){
+                        posLadij1[id.charCodeAt(1)-65][pos+i-1] = true;
+                    } else {
+                        posLadij2[id.charCodeAt(1)-65][pos+i-1] = true;
+                    }
+                    let img = document.createElement("img");
+                    img.src = "slike/"+ladja+`${(i+1)}.png`;
+                    document.getElementById(id.substring(0, 2) + (pos+i)).appendChild(img);
+                }
+                eval("eleP_"+ ladja +".textContent = (num-1) + 'x'");
+            }
+        }
+        if(rotation == 1 && (pos = id.charCodeAt(1, 1)-64)+length <= 11 && num != 0 && !Number.isNaN(parseInt(id.substring(2)))){
+            let taken = false;
+            for(let i = 0;i < length;i++){
+                if(player == true){
+                    if(posLadij1[pos+i-1][parseInt(id.substring(2))-1] == true)taken = true;
+                } else {
+                    if(posLadij2[pos+i-1][parseInt(id.substring(2))-1] == true)taken = true;
+                }
+            }
+            if(taken == false){
+                for(let i = 0;i < length;i++){
+                    if(player == true){
+                        posLadij1[pos+i-1][parseInt(id.substring(2))-1] = true;
+                    } else {
+                        posLadij2[pos+i-1][parseInt(id.substring(2))-1] = true;
+                    }
+                    let img = document.createElement("img");
+                    img.src = "slike/"+ladja+`${(i+1)}.png`;
+                    img.style.transform = "rotate(90deg)";
+                    document.getElementById(id.substring(0, 1) + String.fromCharCode(pos+i+64) + id.substring(2)).appendChild(img);
+                }
+                eval("eleP_"+ ladja +".textContent = (num-1) + 'x'");
+            }
+        }
+    }
+}
+let gameloop = function(event){
+    let id = event.target.id;
+    if(!Number.isNaN(parseInt(id.substring(2))) ){
+        if(player){
+            posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
+            if(posLadij2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1]){
+                console.log("a");
+            }
+        }
+    }
+};
 let eleB_1 = document.createElement("button");
 eleB_1.id = "button1";
 eleB_1.textContent = "Konec postavljanja";
@@ -86,10 +192,8 @@ eleB_1.onclick = function(){
 
         divDesna.removeChild(eleB_1);
 
-        box.removeEventListener("click");
-        box.addEventListener("click", function(event){
-            
-        });
+        box.removeEventListener("click", placement);
+        box.addEventListener("click", gameloop);
     }
 };
 
@@ -169,98 +273,7 @@ window.addEventListener("keydown", (event) => {
         rotation = (rotation == 0)? 1:0;
     }
 });
-box.addEventListener("click", function(event){
-    if(selected != 0 && event.target.id != ""){
-        let length = 0;
-        switch(selected){
-            case 1:
-                length = 5;
-                break;
-            case 2:
-                length = 4;
-                break;
-            case 3:
-                length = 3;
-                break;
-            case 4:
-                length = 3;
-                break;
-            case 5:
-                length = 2;
-                break;
-        };
-        let ladja = "";
-        let num = 0;
-        switch(selected){
-        case 1:
-            ladja = "planecarrier";
-            num = parseInt(eleP_planecarrier.textContent.substring(0, 1));
-            break;
-        case 2:
-            ladja = "battleship";
-            num = parseInt(eleP_battleship.textContent.substring(0, 1));
-            break;
-        case 3:
-            ladja = "sub";
-            num = parseInt(eleP_sub.textContent.substring(0, 1));
-            break;
-        case 4:
-            ladja = "cruiser";
-            num = parseInt(eleP_cruiser.textContent.substring(0, 1));
-            break;
-        case 5:
-            ladja = "destroyer";
-            num = parseInt(eleP_destroyer.textContent.substring(0, 1));
-            break;
-        };
-        let id = event.target.id;
-        let pos = 0;
-        if(rotation == 0 && (pos = parseInt(id.substring(2)))+length <= 11 && num != 0){
-            let taken = false;
-            for(let i = 0;i < length;i++){
-                if(player == true)
-                    if(posLadij1[id.charCodeAt(1)-65][pos+i-1] == true)taken = true;
-                else
-                    if(posLadij2[id.charCodeAt(1)-65][pos+i-1] == true)taken = true;
-            }
-            if(taken == false){
-                for(let i = 0;i < length;i++){
-                    if(player == true)
-                        posLadij1[id.charCodeAt(1)-65][pos+i-1] = true;
-                    else
-                        posLadij2[id.charCodeAt(1)-65][pos+i-1] = true;
-                    let img = document.createElement("img");
-                    img.src = "slike/"+ladja+`${(i+1)}.png`;
-                    document.getElementById(id.substring(0, 2) + (pos+i)).appendChild(img);
-                }
-                eval("eleP_"+ ladja +".textContent = (num-1) + 'x'");
-            }
-        }
-        if(rotation == 1 && (pos = id.charCodeAt(1, 1)-64)+length <= 11 && num != 0 && !Number.isNaN(parseInt(id.substring(2)))){
-            console.log(parseInt(id.substring(2)));
-            let taken = false;
-            for(let i = 0;i < length;i++){
-                if(player == true)
-                    if(posLadij1[pos+i-1][parseInt(id.substring(2))-1] == true)taken = true;
-                else
-                    if(posLadij2[pos+i-1][parseInt(id.substring(2))-1] == true)taken = true;
-            }
-            if(taken == false){
-                for(let i = 0;i < length;i++){
-                    if(player == true)
-                        posLadij1[pos+i-1][parseInt(id.substring(2))-1] = true;
-                    else
-                        posLadij2[pos+i-1][parseInt(id.substring(2))-1] = true;
-                    let img = document.createElement("img");
-                    img.src = "slike/"+ladja+`${(i+1)}.png`;
-                    img.style.transform = "rotate(90deg)";
-                    document.getElementById(id.substring(0, 1) + String.fromCharCode(pos+i+64) + id.substring(2)).appendChild(img);
-                }
-                eval("eleP_"+ ladja +".textContent = (num-1) + 'x'");
-            }
-        }
-    }
-});
+box.addEventListener("click", placement);
 
 function setupPlacement(){
     divDesna.appendChild(eleP_planecarrier);
