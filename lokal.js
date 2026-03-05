@@ -29,6 +29,21 @@ eleP_destroyer.id = "P_destroyer";
 let eleIMG_destroyer = document.createElement("img");
 eleIMG_destroyer.src = "slike/destroyer.png";
 eleIMG_destroyer.onclick = function(){selected = 5;window.dispatchEvent(selectChange);};
+function flipColors(){
+    let color = (player)? "#DC143C":"rgb(0, 119, 255)";
+    for(let i = 0;i < 10;i++){
+        for(let j = 0;j < 10;j++){
+            let temp = document.getElementById("d"+(String.fromCharCode(i+65))+(j+1));
+            if(temp.firstElementChild != null)
+                temp.removeChild(temp.firstElementChild);
+                temp.style.backgroundColor = color;
+        }
+        document.getElementById("d"+(i+1)).style.backgroundColor = color;
+        document.getElementById("d"+(String.fromCharCode(i+65))).style.backgroundColor = color;
+    }
+    document.getElementById("d0").style.backgroundColor = color;
+    document.getElementById("main_c").style.backgroundColor = color;
+}
 let placement = function(event){
     if(selected != 0 && event.target.id != ""){
         let length = 0;
@@ -124,14 +139,44 @@ let placement = function(event){
         }
     }
 }
+let timeout = false;
 let gameloop = function(event){
     let id = event.target.id;
-    if(!Number.isNaN(parseInt(id.substring(2))) ){
-        if(player){
-            posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
-            if(posLadij2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1]){
-                console.log("a");
+    if(!Number.isNaN(parseInt(id.substring(2))) && !timeout){
+        if(!player){
+            if(posLadij2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true){
+                let img = document.createElement("img");
+                img.src = "slike/x.png";
+                event.target.appendChild(img);
+            } else  if(posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true) {
+                let img = document.createElement("img");
+                img.src = "slike/dot.png";
+                event.target.appendChild(img);
             }
+            posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
+            timeout = true;
+            setTimeout(function(){
+                flipColors();
+                player = !player;
+                timeout = false;
+            }, 2000);
+        } else {
+            if(posLadij1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true){
+                let img = document.createElement("img");
+                img.src = "slike/x.png";
+                event.target.appendChild(img);
+            } else if(posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true) {
+                let img = document.createElement("img");
+                img.src = "slike/dot.png";
+                event.target.appendChild(img);
+            }
+            posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
+            timeout = true;
+            setTimeout(function(){
+                flipColors();
+                player = !player;
+                timeout = false;
+            }, 2000);
         }
     }
 };
@@ -146,35 +191,17 @@ eleB_1.onclick = function(){
             eleP_sub.textContent = "1x";
             eleP_cruiser.textContent = "2x";
             eleP_destroyer.textContent = "2x";
-            for(let i = 0;i < 10;i++){
-                for(let j = 0;j < 10;j++){
-                    let temp = document.getElementById("d"+(String.fromCharCode(i+65))+(j+1));
-                    if(temp.firstElementChild != null)
-                    temp.removeChild(temp.firstElementChild);
-                    temp.style.backgroundColor = "#DC143C";
-                }
-                document.getElementById("d"+(i+1)).style.backgroundColor = "#DC143C";
-                document.getElementById("d"+(String.fromCharCode(i+65))).style.backgroundColor = "#DC143C";
-            }
-            document.getElementById("d0").style.backgroundColor = "#DC143C";
-            document.getElementById("main_c").style.backgroundColor = "#DC143C";
+            flipColors();
             player = !player;
         }
     } else {
-        player = !player;
         for(let i = 0;i < 10;i++){
             for(let j = 0;j < 10;j++){
                 let temp = document.getElementById("d"+(String.fromCharCode(i+65))+(j+1));
                 if(temp.firstElementChild != null)
-                temp.removeChild(temp.firstElementChild);
-                temp.style.backgroundColor = "rgb(0, 119, 255)";
+                    temp.removeChild(temp.firstElementChild);
             }
-            document.getElementById("d"+(i+1)).style.backgroundColor = "rgb(0, 119, 255)";
-            document.getElementById("d"+(String.fromCharCode(i+65))).style.backgroundColor = "rgb(0, 119, 255)";
         }
-        document.getElementById("d0").style.backgroundColor = "rgb(0, 119, 255)";
-        document.getElementById("main_c").style.backgroundColor = "rgb(0, 119, 255)";
-    
         divDesna.removeChild(eleP_planecarrier);
         divDesna.removeChild(eleIMG_planecarrier);
 
