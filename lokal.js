@@ -29,6 +29,39 @@ eleP_destroyer.id = "P_destroyer";
 let eleIMG_destroyer = document.createElement("img");
 eleIMG_destroyer.src = "slike/destroyer.png";
 eleIMG_destroyer.onclick = function(){selected = 5;window.dispatchEvent(selectChange);};
+let posLadij1 = new Array(10);
+for(let i = 0;i < posLadij1.length;i++){
+    posLadij1[i] = new Array(10);
+    for(let j = 0;j < posLadij1[i].length;j++){
+        posLadij1[i][j] = false;
+    }
+};
+let posLadij2 = new Array(10);
+for(let i = 0;i < posLadij2.length;i++){
+    posLadij2[i] = new Array(10);
+    for(let j = 0;j < posLadij2[i].length;j++){
+        posLadij2[i][j] = false;
+    }
+};
+let posHits1 = new Array(10);
+for(let i = 0;i < posHits1.length;i++){
+    posHits1[i] = new Array(10);
+    for(let j = 0;j < posHits1[i].length;j++){
+        posHits1[i][j] = false;
+    }
+};
+let posHits2 = new Array(10);
+for(let i = 0;i < posHits2.length;i++){
+    posHits2[i] = new Array(10);
+    for(let j = 0;j < posHits2[i].length;j++){
+        posHits2[i][j] = false;
+    }
+};
+window.addEventListener("keydown", (event) => {
+    if (event.key === "r"){
+        rotation = (rotation == 0)? 1:0;
+    }
+});
 function flipColors(){
     let color = (player)? "#DC143C":"rgb(0, 119, 255)";
     for(let i = 0;i < 10;i++){
@@ -139,44 +172,97 @@ let placement = function(event){
         }
     }
 }
+function setupTurn(id) {
+    for(let i = 0;i < 10;i++){
+        for(let j = 0;j < 10;j++){
+            let temp = document.getElementById("d"+(String.fromCharCode(i+65))+(j+1));
+            if(!player){
+                if(posLadij2[i][j] && posHits1[i][j]){
+                    let img = document.createElement("img");
+                    img.src = "slike/x.png";
+                    temp.appendChild(img);
+                } else if(!posLadij2[i][j] && posHits1[i][j]){
+                    let img = document.createElement("img");
+                    img.src = "slike/dot.png";
+                    temp.appendChild(img);
+                }
+            } else {
+                if(posLadij1[i][j] && posHits2[i][j]){
+                    let img = document.createElement("img");
+                    img.src = "slike/x.png";
+                    temp.appendChild(img);
+                } else if(!posLadij1[i][j] && posHits2[i][j]){
+                    let img = document.createElement("img");
+                    img.src = "slike/dot.png";
+                    temp.appendChild(img);
+                }
+            }
+        }
+    }
+}
 let timeout = false;
 let gameloop = function(event){
     let id = event.target.id;
     if(!Number.isNaN(parseInt(id.substring(2))) && !timeout){
         if(!player){
+            let win = true;
             if(posLadij2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true){
                 let img = document.createElement("img");
                 img.src = "slike/x.png";
                 event.target.appendChild(img);
+                for(let i = 0;i < 10;i++){
+                    for(let j = 0;j < 10;j++){
+                        if(posLadij2[i][j] != posHits1[i][j] && posLadij2[i][j]){
+                            win = false;
+                        }
+                    }
+                }
+                if(win){
+                    box.removeEventListener("click", gameloop);
+                    alert("Zmagal si!");
+                }
             } else  if(posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true) {
                 let img = document.createElement("img");
                 img.src = "slike/dot.png";
                 event.target.appendChild(img);
+                timeout = true;
+                setTimeout(function(){
+                    flipColors();
+                    player = !player;
+                    timeout = false;
+                    setupTurn(id)
+                }, 2000);
             }
             posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
-            timeout = true;
-            setTimeout(function(){
-                flipColors();
-                player = !player;
-                timeout = false;
-            }, 2000);
         } else {
             if(posLadij1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true){
                 let img = document.createElement("img");
                 img.src = "slike/x.png";
                 event.target.appendChild(img);
-            } else if(posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true) {
+                for(let i = 0;i < 10;i++){
+                    for(let j = 0;j < 10;j++){
+                        if(posLadij1[i][j] != posHits2[i][j] && posLadij1[i][j]){
+                            win = false;
+                        }
+                    }
+                }
+                if(win){
+                    box.removeEventListener("click", gameloop);
+                    alert("Zmagal si!");
+                }
+            } else if(posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true) {
                 let img = document.createElement("img");
                 img.src = "slike/dot.png";
                 event.target.appendChild(img);
+                timeout = true;
+                setTimeout(function(){
+                    flipColors();
+                    player = !player;
+                    timeout = false;
+                    setupTurn(id);
+                }, 2000);
             }
             posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
-            timeout = true;
-            setTimeout(function(){
-                flipColors();
-                player = !player;
-                timeout = false;
-            }, 2000);
         }
     }
 };
@@ -266,39 +352,6 @@ box.addEventListener("mouseout", function(event){
         event.target.style.background = "rgb(0, 119, 255)";
     else
         event.target.style.background = "#DC143C";
-});
-let posLadij1 = new Array(10);
-for(let i = 0;i < posLadij1.length;i++){
-    posLadij1[i] = new Array(10);
-    for(let j = 0;j < posLadij1[i].length;j++){
-        posLadij1[i][j] = false;
-    }
-};
-let posLadij2 = new Array(10);
-for(let i = 0;i < posLadij2.length;i++){
-    posLadij2[i] = new Array(10);
-    for(let j = 0;j < posLadij2[i].length;j++){
-        posLadij2[i][j] = false;
-    }
-};
-let posHits1 = new Array(10);
-for(let i = 0;i < posHits1.length;i++){
-    posHits1[i] = new Array(10);
-    for(let j = 0;j < posHits1[i].length;j++){
-        posHits1[i][j] = false;
-    }
-};
-let posHits2 = new Array(10);
-for(let i = 0;i < posHits2.length;i++){
-    posHits2[i] = new Array(10);
-    for(let j = 0;j < posHits2[i].length;j++){
-        posHits2[i][j] = false;
-    }
-};
-window.addEventListener("keydown", (event) => {
-    if (event.key === "r"){
-        rotation = (rotation == 0)? 1:0;
-    }
 });
 box.addEventListener("click", placement);
 
