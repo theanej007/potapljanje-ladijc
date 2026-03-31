@@ -29,6 +29,9 @@ eleP_destroyer.id = "P_destroyer";
 let eleIMG_destroyer = document.createElement("img");
 eleIMG_destroyer.src = "slike/destroyer.png";
 eleIMG_destroyer.onclick = function(){selected = 5;window.dispatchEvent(selectChange);};
+let smer = document.createElement("img");
+smer.src = "slike/smer.png";
+smer.style.pointerEvents = "none";
 let posLadij1 = new Array(10);
 for(let i = 0;i < posLadij1.length;i++){
     posLadij1[i] = new Array(10);
@@ -343,15 +346,26 @@ window.addEventListener("selectChanged", function(){
 
 let box = document.getElementById("main_c");
 box.addEventListener("mouseover", function(event){
-    if(selected != 0 && event.target.id != ""){
-        event.target.style.background = "#4CBB17";
+    let id = event.target.id;
+    if((!posLadij1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && player) || (!posLadij2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && !player)){
+        if(selected != 0 && id != ""){
+            event.target.style.background = "#4CBB17";
+            if(rotation == 1){
+                smer.style.transform = "rotate(90deg)";
+            } else {
+                smer.style.transform = "rotate(0deg)";
+            }
+            event.target.appendChild(smer);
+        }
     }
 });
 box.addEventListener("mouseout", function(event){
-    if(player == true)
+    if(player == true){
         event.target.style.background = "rgb(0, 119, 255)";
-    else
+    } else {
         event.target.style.background = "#DC143C";
+    }
+    event.target.removeChild(smer);
 });
 box.addEventListener("click", placement);
 
