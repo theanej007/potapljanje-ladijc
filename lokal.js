@@ -136,6 +136,10 @@ let placement = function(event){
                 }
             }
             if(taken == false){
+                let temp = document.getElementById(id);
+                if(temp.firstElementChild != null){
+                    temp.removeChild(temp.firstElementChild);
+                }
                 for(let i = 0;i < length;i++){
                     if(player == true){
                         posLadij1[id.charCodeAt(1)-65][pos+i-1] = true;
@@ -159,6 +163,10 @@ let placement = function(event){
                 }
             }
             if(taken == false){
+                let temp = document.getElementById(id);
+                if(temp.firstElementChild != null){
+                    temp.removeChild(temp.firstElementChild);
+                }
                 for(let i = 0;i < length;i++){
                     if(player == true){
                         posLadij1[pos+i-1][parseInt(id.substring(2))-1] = true;
@@ -207,23 +215,12 @@ let timeout = false;
 let gameloop = function(event){
     let id = event.target.id;
     if(!Number.isNaN(parseInt(id.substring(2))) && !timeout){
+        let win = true;
         if(!player){
-            let win = true;
             if(posLadij2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true){
                 let img = document.createElement("img");
                 img.src = "slike/x.png";
                 event.target.appendChild(img);
-                for(let i = 0;i < 10;i++){
-                    for(let j = 0;j < 10;j++){
-                        if(posLadij2[i][j] != posHits1[i][j] && posLadij2[i][j]){
-                            win = false;
-                        }
-                    }
-                }
-                if(win){
-                    box.removeEventListener("click", gameloop);
-                    alert("Zmagal si!");
-                }
             } else  if(posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true) {
                 let img = document.createElement("img");
                 img.src = "slike/dot.png";
@@ -234,25 +231,38 @@ let gameloop = function(event){
                     player = !player;
                     timeout = false;
                     setupTurn(id)
-                }, 2000);
+                }, 1500);
             }
             posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
+            for(let i = 0;i < 10;i++){
+                for(let j = 0;j < 10;j++){
+                    if(!posHits1[i][j] && posLadij2[i][j]){
+                        win = false;
+                    }
+                }
+            }
+            if(win){
+                box.removeEventListener("click", gameloop);
+                for(let i = 0;i < 10;i++){
+                    for(let j = 0;j < 10;j++){
+                        if(posLadij2[i][j] == posHits1[i][j] && posLadij2[i][j]){
+                            let img = document.createElement("img");
+                            img.src = "slike/boom.gif";
+                            let temp = document.getElementById("d"+(String.fromCharCode(i+65))+(j+1));
+                            if(temp.firstElementChild != null){
+                                temp.removeChild(temp.firstElementChild);
+                            }
+                            temp.appendChild(img);
+                        }
+                    }
+                }
+                alert("Zmagal si!");
+            }
         } else {
             if(posLadij1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true){
                 let img = document.createElement("img");
                 img.src = "slike/x.png";
                 event.target.appendChild(img);
-                for(let i = 0;i < 10;i++){
-                    for(let j = 0;j < 10;j++){
-                        if(posLadij1[i][j] != posHits2[i][j] && posLadij1[i][j]){
-                            win = false;
-                        }
-                    }
-                }
-                if(win){
-                    box.removeEventListener("click", gameloop);
-                    alert("Zmagal si!");
-                }
             } else if(posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] != true) {
                 let img = document.createElement("img");
                 img.src = "slike/dot.png";
@@ -263,9 +273,33 @@ let gameloop = function(event){
                     player = !player;
                     timeout = false;
                     setupTurn(id);
-                }, 2000);
+                }, 1500);
             }
             posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
+            for(let i = 0;i < 10;i++){
+                for(let j = 0;j < 10;j++){
+                    if(!posHits2[i][j] && posLadij1[i][j]){
+                        win = false;
+                    }
+                }
+            }
+            if(win){
+                box.removeEventListener("click", gameloop);
+                for(let i = 0;i < 10;i++){
+                    for(let j = 0;j < 10;j++){
+                        if(posLadij1[i][j] == posHits2[i][j] && posLadij1[i][j]){
+                            let img = document.createElement("img");
+                            img.src = "slike/boom.gif";
+                            let temp = document.getElementById("d"+(String.fromCharCode(i+65))+(j+1));
+                            if(temp.firstElementChild != null){
+                                temp.removeChild(temp.firstElementChild);
+                            }
+                            temp.appendChild(img);
+                        }
+                    }
+                }
+                alert("Zmagal si!");
+            }
         }
     }
 };
@@ -310,6 +344,7 @@ eleB_1.onclick = function(){
 
         box.removeEventListener("click", placement);
         box.addEventListener("click", gameloop);
+        selection = false;
     }
 };
 
@@ -319,6 +354,7 @@ let player = true;
 let selected = 0;
 let ships = 7;
 let rotation = 0;
+let selection = true;
 const selectChange = new CustomEvent("selectChanged");
 window.addEventListener("selectChanged", function(){
     eleIMG_planecarrier.style.background = "transparent";
@@ -347,17 +383,23 @@ window.addEventListener("selectChanged", function(){
 let box = document.getElementById("main_c");
 box.addEventListener("mouseover", function(event){
     let id = event.target.id;
-    if((!posLadij1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && player) || (!posLadij2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && !player)){
-        if(selected != 0 && id != ""){
-            event.target.style.background = "#4CBB17";
-            if(rotation == 1){
-                smer.style.transform = "rotate(90deg)";
-            } else {
-                smer.style.transform = "rotate(0deg)";
+    try{
+        if(((!posLadij1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && player) || (!posLadij2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] && !player)) && selection){
+            if(selected != 0 && parseInt(id.substring(2)) > 0){
+                event.target.style.background = "#4CBB17";
+                if(rotation == 1){
+                    smer.style.transform = "rotate(90deg)";
+                } else {
+                    smer.style.transform = "rotate(0deg)";
+                }
+                event.target.appendChild(smer);
             }
-            event.target.appendChild(smer);
+        } else {
+            if(selected != 0 && parseInt(id.substring(2)) > 0){
+                event.target.style.background = "#4CBB17";
+            }
         }
-    }
+    } catch (e){}
 });
 box.addEventListener("mouseout", function(event){
     if(player == true){
@@ -365,7 +407,9 @@ box.addEventListener("mouseout", function(event){
     } else {
         event.target.style.background = "#DC143C";
     }
-    event.target.removeChild(smer);
+    try {
+        event.target.removeChild(smer);
+    } catch (e) {}
 });
 box.addEventListener("click", placement);
 
