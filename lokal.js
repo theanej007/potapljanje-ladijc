@@ -183,7 +183,7 @@ let placement = function(event){
         }
     }
 }
-function setupTurn(id) {
+function setupTurn() {
     for(let i = 0;i < 10;i++){
         for(let j = 0;j < 10;j++){
             let temp = document.getElementById("d"+(String.fromCharCode(i+65))+(j+1));
@@ -230,7 +230,7 @@ let gameloop = function(event){
                     flipColors();
                     player = !player;
                     timeout = false;
-                    setupTurn(id)
+                    setupTurn()
                 }, 1500);
             }
             posHits1[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
@@ -272,7 +272,7 @@ let gameloop = function(event){
                     flipColors();
                     player = !player;
                     timeout = false;
-                    setupTurn(id);
+                    setupTurn();
                 }, 1500);
             }
             posHits2[id.charCodeAt(1)-65][parseInt(id.substring(2))-1] = true;
